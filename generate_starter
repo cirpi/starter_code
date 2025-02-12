@@ -1,0 +1,34 @@
+#!/usr/bin/python3
+print("Filename: ", end="")
+fileNames = input()
+
+ar = fileNames.split(' ')
+
+
+# makefile contents
+makefile_contents = '''run:
+\tgo run *.go'''
+
+import os
+rootDir = "/home/sirpi/cp"
+for file in ar:
+
+    # make dir
+    dirCmd = f'mkdir -p {rootDir}/problems/{file}'
+    os.system(dirCmd)
+
+
+
+    #create makefile 
+    makefile = open(f'{rootDir}/problems/{file}/makefile', 'w')
+    makefile.write(makefile_contents)
+    makefile.close()
+
+
+    # copy the starter code
+    cmd = f'cp {rootDir}/starter.go {rootDir}/problems/{file}/{file+".go"}'
+    os.system(cmd)
+
+    # Response to the user
+    tick = '✓'
+    print(f'{rootDir}/problems/{file}/{file+".go"} {tick}')
