@@ -105,9 +105,55 @@ func lowerBound[T Search](target T, ar []T) int {
 
 // Start
 func main() {
-	println("Works fine ✓")
+	var s, t string
+	fmt.Scan(&s)
+	fmt.Scan(&t)
+	m, n := len(s), len(t)
+	dp := make([][]int, m+1)
+	for i := range dp {
+		dp[i] = make([]int, n+1)
+	}
+	for i := range m + 1 {
+		dp[i][0] = i
+	}
+	for i := range n + 1 {
+		dp[0][i] = i
+	}
+	for i := 1; i <= m; i++ {
+		for j := 1; j <= n; j++ {
+			if s[i-1] == t[j-1] {
+				dp[i][j] = dp[i-1][j-1]
+			} else {
+				dp[i][j] = 1 + min(dp[i][j-1], dp[i-1][j], dp[i-1][j-1])
+			}
+		}
+	}
+	println(dp[m][n])
 	flush()
+}
 
+func solve(i, j int, s, t string) int {
+	if i < 0 && j < 0 {
+		return 0
+	}
+	if i < 0 {
+		return j + 1
+	}
+	if j < 0 {
+		return i + 1
+	}
+	res := math.MaxInt
+	if s[i] == t[j] {
+		res = solve(i-1, j-1, s, t)
+	} else {
+		// add
+		res = 1 + solve(i, j-1, s, t)
+		// remove
+		res = min(res, 1+solve(i-1, j, s, t))
+		//replace
+		res = min(res, 1+solve(i-1, j-1, s, t))
+	}
+	return res
 }
 
 // Interfaces for my convenience
@@ -169,32 +215,6 @@ func flush() {
 }
 
 // Reading, parsing, and assigning integer(s)
-func readString() string {
-	str, er := RW.ReadString('\n')
-	if er != nil {
-		log.Fatal(er)
-	}
-	return strings.TrimSpace(str)
-}
-
-func readStrings() []string {
-	str := readString()
-	return strings.Fields(str)
-}
-
-// get an byte slice; use with predictable input
-func readBytes() []byte {
-	str := readString()
-	ar := []byte{}
-	for i := range str {
-		if str[i] == ' ' {
-			continue
-		}
-		ar = append(ar, str[i])
-	}
-	return ar
-}
-
 func readInt[T Number]() T {
 	str, er := RW.ReadString('\n')
 	if er != nil {

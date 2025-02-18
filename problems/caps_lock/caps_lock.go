@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"log"
 	"math"
@@ -105,7 +106,31 @@ func lowerBound[T Search](target T, ar []T) int {
 
 // Start
 func main() {
-	println("Works fine ✓")
+	str, _ := RW.ReadString('\n')
+	str = strings.TrimSpace(str)
+	upper, lower, first := 0, 0, false
+
+	for i := range str {
+		if str[i] >= 'a' && str[i] <= 'z' {
+			lower++
+			if i == 0 {
+				first = true
+			}
+		} else {
+			upper++
+		}
+	}
+	ans := []byte(str)
+	if first && lower == 1 {
+		ans = bytes.ToLower(ans)
+		ans[0] -= 32
+		println(string(ans))
+	} else if upper == len(str) {
+		ans = bytes.ToLower(ans)
+		println(string(ans))
+	} else {
+		println(string(ans))
+	}
 	flush()
 
 }
@@ -169,32 +194,6 @@ func flush() {
 }
 
 // Reading, parsing, and assigning integer(s)
-func readString() string {
-	str, er := RW.ReadString('\n')
-	if er != nil {
-		log.Fatal(er)
-	}
-	return strings.TrimSpace(str)
-}
-
-func readStrings() []string {
-	str := readString()
-	return strings.Fields(str)
-}
-
-// get an byte slice; use with predictable input
-func readBytes() []byte {
-	str := readString()
-	ar := []byte{}
-	for i := range str {
-		if str[i] == ' ' {
-			continue
-		}
-		ar = append(ar, str[i])
-	}
-	return ar
-}
-
 func readInt[T Number]() T {
 	str, er := RW.ReadString('\n')
 	if er != nil {

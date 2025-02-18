@@ -105,8 +105,31 @@ func lowerBound[T Search](target T, ar []T) int {
 
 // Start
 func main() {
-	println("Works fine ✓")
+	t := readInt[int]()
+	for t != 0 {
+		solve()
+		t--
+	}
 	flush()
+
+}
+func solve() {
+	var l1, l2 int
+	readInts[int](&l1, &l2)
+	a, b := readInts[int](), readInts[int]()
+	m := map[int]int{}
+	for i := range a {
+		m[a[i]]++
+	}
+	for i := range b {
+		if m[b[i]] != 0 {
+			println("YES")
+			println(1, b[i])
+			return
+		}
+	}
+	println("NO")
+	return
 
 }
 
@@ -169,32 +192,6 @@ func flush() {
 }
 
 // Reading, parsing, and assigning integer(s)
-func readString() string {
-	str, er := RW.ReadString('\n')
-	if er != nil {
-		log.Fatal(er)
-	}
-	return strings.TrimSpace(str)
-}
-
-func readStrings() []string {
-	str := readString()
-	return strings.Fields(str)
-}
-
-// get an byte slice; use with predictable input
-func readBytes() []byte {
-	str := readString()
-	ar := []byte{}
-	for i := range str {
-		if str[i] == ' ' {
-			continue
-		}
-		ar = append(ar, str[i])
-	}
-	return ar
-}
-
 func readInt[T Number]() T {
 	str, er := RW.ReadString('\n')
 	if er != nil {

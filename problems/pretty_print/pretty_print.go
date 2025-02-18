@@ -105,9 +105,67 @@ func lowerBound[T Search](target T, ar []T) int {
 
 // Start
 func main() {
-	println("Works fine ✓")
+	words := []string{
+		"aaa",
+		"bbb",
+		"c",
+		"d",
+		"ee",
+		"ff",
+		"ggggggg",
+	}
+	line_length := 11
+	// ans := solve(len(words)-1, line_length, words)
+	ans := dpSolution(words, line_length)
+	println(ans)
+	// getLen(0, 1, words, line_length)
 	flush()
 
+}
+
+func solve(ind, l int, words []string) int {
+	if ind < 0 {
+		return 0
+	}
+	ans := math.MaxInt
+	for i := ind; i >= 0; i-- {
+		if isPossible, length := getLen(i, ind, words, l); isPossible {
+			ans = min(ans, solve(i-1, l, words)+length)
+		}
+	}
+	return ans
+}
+
+func dpSolution(words []string, line_length int) int {
+	dp := make([]int, len(words)+1)
+	dp[0] = 0
+	n := len(words)
+	for ind := 1; ind <= n; ind++ {
+		ans := math.MaxInt
+		for i := ind; i > 0; i-- {
+			if isPossible, length := getLen(i-1, ind-1, words, line_length); isPossible {
+				ans = min(ans, dp[i-1]+length)
+			}
+		}
+		dp[ind] = ans
+	}
+	return dp[n]
+}
+
+func getLen(i, j int, words []string, l int) (bool, int) {
+	length := 0
+	space := 0
+	for ind := 0; ind <= (j - i); ind++ {
+		length += len(words[i+ind])
+		if ind > 0 {
+			space++
+		}
+		if length+space > l {
+			return false, 0
+		}
+	}
+	// println(pow((l - (length + space)), 2))
+	return true, pow((l - (length + space)), 2)
 }
 
 // Interfaces for my convenience
@@ -169,32 +227,6 @@ func flush() {
 }
 
 // Reading, parsing, and assigning integer(s)
-func readString() string {
-	str, er := RW.ReadString('\n')
-	if er != nil {
-		log.Fatal(er)
-	}
-	return strings.TrimSpace(str)
-}
-
-func readStrings() []string {
-	str := readString()
-	return strings.Fields(str)
-}
-
-// get an byte slice; use with predictable input
-func readBytes() []byte {
-	str := readString()
-	ar := []byte{}
-	for i := range str {
-		if str[i] == ' ' {
-			continue
-		}
-		ar = append(ar, str[i])
-	}
-	return ar
-}
-
 func readInt[T Number]() T {
 	str, er := RW.ReadString('\n')
 	if er != nil {

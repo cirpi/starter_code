@@ -6,6 +6,7 @@ import (
 	"log"
 	"math"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -105,9 +106,62 @@ func lowerBound[T Search](target T, ar []T) int {
 
 // Start
 func main() {
-	println("Works fine ✓")
+	// getting inputs
+	process := readInts[int]()
+	capacity := readInts[int]()
+	solve(process, capacity)
 	flush()
 
+}
+
+func solve(process, capacity []int) {
+	// best and worst possible times
+	sort.Slice(process, func(i, j int) bool {
+		return process[i] > process[j]
+	})
+	sort.Slice(capacity, func(i, j int) bool {
+		return capacity[i] > capacity[j]
+	})
+	l, r := 1, len(process)
+	ans := -1
+	for l <= r {
+		m := l + (r-l)/2
+
+		if isPossible(process, capacity, m) {
+			ans = m
+			r = m - 1
+		} else {
+			l = m + 1
+		}
+	}
+	println("ans", ans)
+}
+
+func isPossible(process, capacity []int, m int) bool {
+	// the number of process that each processor can compute in m unit of time.
+	capSlots := make([]int, len(capacity)*m)
+	ind := 0
+	for _, v := range capacity {
+		for i := range m {
+			_ = i
+			capSlots[ind] = v
+			ind++
+		}
+	}
+	for _, v := range process {
+		canDo := false
+		for i, slotSize := range capSlots {
+			if slotSize >= v {
+				canDo = true
+				capSlots[i] = -1
+				break
+			}
+		}
+		if !canDo {
+			return false
+		}
+	}
+	return true
 }
 
 // Interfaces for my convenience
@@ -169,32 +223,6 @@ func flush() {
 }
 
 // Reading, parsing, and assigning integer(s)
-func readString() string {
-	str, er := RW.ReadString('\n')
-	if er != nil {
-		log.Fatal(er)
-	}
-	return strings.TrimSpace(str)
-}
-
-func readStrings() []string {
-	str := readString()
-	return strings.Fields(str)
-}
-
-// get an byte slice; use with predictable input
-func readBytes() []byte {
-	str := readString()
-	ar := []byte{}
-	for i := range str {
-		if str[i] == ' ' {
-			continue
-		}
-		ar = append(ar, str[i])
-	}
-	return ar
-}
-
 func readInt[T Number]() T {
 	str, er := RW.ReadString('\n')
 	if er != nil {

@@ -1,4 +1,22 @@
 #!/usr/bin/python3
+import sys
+import os
+numToFolderMapping = {
+        1: "problems",
+        2: "assessments",
+        3: "contests",
+        4: "study",
+}
+folder = numToFolderMapping[1]
+if len(sys.argv) > 1:
+    if sys.argv[1] == "help":
+        print(numToFolderMapping)
+        print("Default: 1")
+        sys.exit(1)
+    num = int(sys.argv[1])
+    folder = numToFolderMapping[num]
+
+
 print("Filename: ", end="")
 fileNames = input()
 
@@ -9,26 +27,25 @@ ar = fileNames.split(' ')
 makefile_contents = '''run:
 \tgo run *.go'''
 
-import os
 rootDir = "/home/sirpi/cp"
 for file in ar:
 
     # make dir
-    dirCmd = f'mkdir -p {rootDir}/problems/{file}'
+    dirCmd = f'mkdir -p {rootDir}/{folder}/{file}'
     os.system(dirCmd)
 
 
 
     #create makefile 
-    makefile = open(f'{rootDir}/problems/{file}/makefile', 'w')
+    makefile = open(f'{rootDir}/{folder}/{file}/makefile', 'w')
     makefile.write(makefile_contents)
     makefile.close()
 
 
     # copy the starter code
-    cmd = f'cp {rootDir}/starter.go {rootDir}/problems/{file}/{file+".go"}'
+    cmd = f'cp {rootDir}/starter.go {rootDir}/{folder}/{file}/{file+".go"}'
     os.system(cmd)
 
     # Response to the user
     tick = '✓'
-    print(f'{rootDir}/problems/{file}/{file+".go"} {tick}')
+    print(f'{rootDir}/{folder}/{file}/{file+".go"} {tick}')
