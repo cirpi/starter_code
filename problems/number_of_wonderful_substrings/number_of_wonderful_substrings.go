@@ -10,24 +10,14 @@ import (
 	"strings"
 )
 
-// Custom types
-type i6 int64
-type i3 int32
-type f3 float32
-type f6 float64
-
-type Pair[T, E any] struct {
-	first  T
-	second E
-}
-
-func pair[T, E any](t T, e E) Pair[T, E] {
-	return Pair[T, E]{first: t, second: e}
-}
-
 const (
 	MOD = int(1e9 + 7)
 )
+
+// Custom types
+type i6 int64
+type i3 int32
+type i int
 
 // Commonly used utility functions
 func sum[T Number](ar []T) T {
@@ -120,9 +110,41 @@ func lowerBound[T Search](target T, ar []T) int {
 
 // Start
 func main() {
-	println("Works fine ✓")
+	s := readString()
+	solve(s)
 	flush()
 
+}
+func solve(s string) {
+	ans := []string{}
+	m := map[i6][]i6{}
+	res := 0
+	m[0] = []i6{-1}
+	mask := i6(0)
+	for i := range s {
+		mask ^= (1 << getMapping(s[i]))
+
+		if ar, isP := m[mask]; isP {
+			for _, ind := range ar {
+				ans = append(ans, s[ind+1:i+1])
+			}
+			res += len(ar)
+		}
+		for j := range 10 {
+			if ar, isP := m[mask^(1<<j)]; isP {
+				for _, ind := range ar {
+					ans = append(ans, s[ind+1:i+1])
+				}
+				res += len(ar)
+			}
+		}
+		m[mask] = append(m[mask], i6(i))
+	}
+	println(ans, "result", res)
+}
+
+func getMapping(a byte) i6 {
+	return i6(a - 'a')
 }
 
 // Interfaces for my convenience
@@ -176,7 +198,6 @@ func initReader(in, out any) {
 }
 
 func init() {
-	// I/O redirection
 	initReader(nil, nil)
 }
 

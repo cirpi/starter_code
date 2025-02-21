@@ -10,21 +10,6 @@ import (
 	"strings"
 )
 
-// Custom types
-type i6 int64
-type i3 int32
-type f3 float32
-type f6 float64
-
-type Pair[T, E any] struct {
-	first  T
-	second E
-}
-
-func pair[T, E any](t T, e E) Pair[T, E] {
-	return Pair[T, E]{first: t, second: e}
-}
-
 const (
 	MOD = int(1e9 + 7)
 )
@@ -120,8 +105,30 @@ func lowerBound[T Search](target T, ar []T) int {
 
 // Start
 func main() {
-	println("Works fine ✓")
+	n := readInt[int]()
+	ar := make([][]int, n)
+	for i := range ar {
+		ar[i] = readInts[int]()
+	}
+	ans := solve(0, 0, ar)
+	println(ans)
 	flush()
+
+}
+
+func solve(currWork int, available int, ar [][]int) int {
+	if currWork == len(ar) {
+		return 0
+	}
+
+	ans := int(1e9)
+	for worker := range len(ar) {
+		if available&(1<<worker) == 0 {
+			res := ar[worker][currWork] + solve(currWork+1, available|(1<<worker), ar)
+			ans = min(ans, res)
+		}
+	}
+	return ans
 
 }
 
@@ -176,7 +183,6 @@ func initReader(in, out any) {
 }
 
 func init() {
-	// I/O redirection
 	initReader(nil, nil)
 }
 

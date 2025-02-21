@@ -10,21 +10,6 @@ import (
 	"strings"
 )
 
-// Custom types
-type i6 int64
-type i3 int32
-type f3 float32
-type f6 float64
-
-type Pair[T, E any] struct {
-	first  T
-	second E
-}
-
-func pair[T, E any](t T, e E) Pair[T, E] {
-	return Pair[T, E]{first: t, second: e}
-}
-
 const (
 	MOD = int(1e9 + 7)
 )
@@ -120,9 +105,41 @@ func lowerBound[T Search](target T, ar []T) int {
 
 // Start
 func main() {
-	println("Works fine ✓")
+	t := readInt[int]()
+	for t > 0 {
+		solve()
+		t--
+	}
 	flush()
 
+}
+
+func solve() {
+	// mod := 998244353
+	n := readInt[int]()
+	ar := readInts[int]()
+	ans := 0
+	dp := make([][4]int, n+1)
+	for i := 1; i <= n; i++ {
+		dp[i][1] = dp[i-1][1]
+		dp[i][2] = dp[i-1][2]
+		dp[i][3] = dp[i-1][3]
+		if ar[i-1] == 1 {
+			// dp[i][1] += 1 + dp[i-1][1]
+			dp[i][1] += 1
+		}
+		if ar[i-1] == 2 {
+			// dp[i][2] += dp[i-1][1] + dp[i-1][2]
+			dp[i][2] += dp[i-1][1]
+		}
+		if ar[i-1] == 3 {
+			// dp[i][3] += dp[i-1][2] + dp[i-1][3]
+			dp[i][3] += dp[i-1][2]
+		}
+	}
+	println(dp)
+	ans = dp[n][3]
+	println(ans)
 }
 
 // Interfaces for my convenience
@@ -176,7 +193,6 @@ func initReader(in, out any) {
 }
 
 func init() {
-	// I/O redirection
 	initReader(nil, nil)
 }
 
@@ -211,21 +227,16 @@ func readBytes() []byte {
 	return ar
 }
 
-func strToInt(str string) int {
-	val, er := strconv.Atoi(str)
-	if er != nil {
-		log.Fatal("readInit", er)
-	}
-	return val
-}
-
 func readInt[T Number]() T {
 	str, er := RW.ReadString('\n')
 	if er != nil {
 		log.Fatal("readInit", er)
 	}
 	str = strings.TrimSpace(str)
-	val := strToInt(str)
+	val, er := strconv.Atoi(str)
+	if er != nil {
+		log.Fatal("readInit", er)
+	}
 	return T(val)
 }
 

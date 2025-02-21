@@ -10,21 +10,6 @@ import (
 	"strings"
 )
 
-// Custom types
-type i6 int64
-type i3 int32
-type f3 float32
-type f6 float64
-
-type Pair[T, E any] struct {
-	first  T
-	second E
-}
-
-func pair[T, E any](t T, e E) Pair[T, E] {
-	return Pair[T, E]{first: t, second: e}
-}
-
 const (
 	MOD = int(1e9 + 7)
 )
@@ -118,11 +103,55 @@ func lowerBound[T Search](target T, ar []T) int {
 	return ans
 }
 
+type pair struct {
+	t   byte
+	val int
+}
+
 // Start
 func main() {
-	println("Works fine ✓")
-	flush()
+	n := readInt[int]()
+	dp := make([][8]int, n+1)
+	for i := range n + 1 {
+		for j := range 8 {
+			dp[i][j] = int(1e9)
+		}
+	}
+	dp[0][0] = 0
+	for i := 1; i <= n; i++ {
+		strs := readStrings()
+		strMask := 0
+		cost := convertStrtoInt(strs[0])
+		for i := range strs[1] {
+			if val := strs[1][i]; val == 'A' {
+				strMask |= 4
+			} else if val == 'B' {
+				strMask |= 2
+			} else {
+				strMask |= 1
+			}
+		}
+		for vit := range 8 {
+			dp[i][vit] = min(dp[i][vit], dp[i-1][vit])
+			dp[i][vit|strMask] = min(dp[i][vit|strMask], dp[i-1][vit]+cost)
+		}
 
+	}
+	ans := dp[n][7]
+	if ans == int(1e9) {
+		ans = -1
+	}
+	println(ans)
+	flush()
+}
+
+func convertStringToBits(str string) int {
+	ans := 0
+	for i := range str {
+		curr := 'C' - str[i]
+		ans = ans | 1<<curr
+	}
+	return ans
 }
 
 // Interfaces for my convenience
@@ -176,7 +205,6 @@ func initReader(in, out any) {
 }
 
 func init() {
-	// I/O redirection
 	initReader(nil, nil)
 }
 
@@ -193,9 +221,11 @@ func readString() string {
 	return strings.TrimSpace(str)
 }
 
-func readStrings() []string {
+func readStrings(strs ...*string) []string {
 	str := readString()
-	return strings.Fields(str)
+	res := strings.Fields(str)
+	assign(res, strs...)
+	return res
 }
 
 // get an byte slice; use with predictable input
@@ -211,22 +241,20 @@ func readBytes() []byte {
 	return ar
 }
 
-func strToInt(str string) int {
+func convertStrtoInt(str string) int {
 	val, er := strconv.Atoi(str)
 	if er != nil {
 		log.Fatal("readInit", er)
 	}
 	return val
 }
-
 func readInt[T Number]() T {
 	str, er := RW.ReadString('\n')
 	if er != nil {
 		log.Fatal("readInit", er)
 	}
 	str = strings.TrimSpace(str)
-	val := strToInt(str)
-	return T(val)
+	return T(convertStrtoInt(str))
 }
 
 func readInts[T Number](addrs ...*T) []T {
